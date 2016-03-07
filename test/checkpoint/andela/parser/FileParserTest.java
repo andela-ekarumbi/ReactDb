@@ -2,7 +2,7 @@ package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferFactory;
-import checkpoint.andela.utility.DbRecord;
+import checkpoint.andela.db.DbRecord;
 
 import org.junit.Before;
 import org.junit.Test;
