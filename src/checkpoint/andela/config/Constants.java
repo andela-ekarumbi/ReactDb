@@ -1,6 +1,7 @@
 package checkpoint.andela.config;
 
 public class Constants {
+
     public static final String[] ALLOWED_ATTRIBUTES = {
             "UNIQUE-ID",
             "TYPES",

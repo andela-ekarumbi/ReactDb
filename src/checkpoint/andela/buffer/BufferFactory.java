@@ -1,6 +1,6 @@
 package checkpoint.andela.buffer;
 
-import checkpoint.andela.utility.DbRecord;
+import checkpoint.andela.db.DbRecord;
 
 public class BufferFactory {
 
