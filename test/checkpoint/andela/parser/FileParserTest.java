@@ -1,6 +1,6 @@
 package checkpoint.andela.parser;
 
-import checkpoint.andela.buffer.Buffer;
+import checkpoint.andela.buffer.SynchronizedBuffer;
 import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.db.DbRecord;
 
@@ -23,7 +23,7 @@ public class FileParserTest {
 
     @Test
     public void testParseFile() throws Exception {
-        Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
+        SynchronizedBuffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
         String issuedKey = dbRecordBuffer.registerClientForTracking();
 
         assertTrue(dbRecordBuffer.checkIfNewData(issuedKey));

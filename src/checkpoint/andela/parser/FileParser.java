@@ -1,6 +1,6 @@
 package checkpoint.andela.parser;
 
-import checkpoint.andela.buffer.Buffer;
+import checkpoint.andela.buffer.SynchronizedBuffer;
 import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.db.DbRecord;
 
@@ -12,7 +12,7 @@ public class FileParser implements Runnable {
 
     private FileReader fileReader;
 
-    private Buffer<DbRecord> dbRecordBuffer;
+    private SynchronizedBuffer<DbRecord> dbRecordBuffer;
 
     private BufferedReader bufferedReader;
 
