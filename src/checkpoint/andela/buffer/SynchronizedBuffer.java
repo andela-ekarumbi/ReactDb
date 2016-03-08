@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SynchronizedBuffer<T extends Object> {
+public class SynchronizedBuffer<T extends Object> implements Buffer<T> {
 
     private List<T> list;
 
@@ -16,6 +16,7 @@ public class SynchronizedBuffer<T extends Object> {
         lastAccessedTracker = new HashMap<>();
     }
 
+    @Override
     public void addToBuffer(T item) {
         synchronized (this) {
             addToList(item);
@@ -26,6 +27,7 @@ public class SynchronizedBuffer<T extends Object> {
         list.add(item);
     }
 
+    @Override
     public void addListToBuffer(List<T> itemsList) {
         synchronized (this) {
             if (itemsList.size() > 0) {
@@ -36,6 +38,7 @@ public class SynchronizedBuffer<T extends Object> {
         }
     }
 
+    @Override
     public String registerClientForTracking() {
         synchronized (this) {
             String randomKey = Double.toString(Math.random() * 100000);
@@ -44,6 +47,7 @@ public class SynchronizedBuffer<T extends Object> {
         }
     }
 
+    @Override
     public boolean checkIfNewData(String issuedKey) {
         synchronized (this) {
             return checkIfKeyExists(issuedKey) && checkForNewData(issuedKey);
@@ -58,6 +62,7 @@ public class SynchronizedBuffer<T extends Object> {
         return lastAccessedTracker.get(issuedKey) < lastAccessedTracker.size();
     }
 
+    @Override
     public List<T> getLatestData(String issuedKey) {
         synchronized (this) {
             List<T> latestData = new ArrayList<>();

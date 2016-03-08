@@ -37,7 +37,7 @@ public class SynchronizedBufferTest {
     public void testAddListToBuffer() throws Exception {
         Thread.sleep(1000);
 
-        SynchronizedBuffer<String> buffer = BufferFactory.getStringLogBuffer();
+        Buffer<String> buffer = BufferFactory.getStringLogBuffer();
 
         String trackingKey = buffer.registerClientForTracking();
         assertNotNull(trackingKey);
