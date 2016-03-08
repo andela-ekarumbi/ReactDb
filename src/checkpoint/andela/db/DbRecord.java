@@ -14,6 +14,7 @@ public class DbRecord {
     }
 
     public boolean addColumn(String columnName, String columnValue) {
+        columnName = columnName.replaceAll("\\?", "");
         List<String> existingEntries = columns.get(columnName);
 
         if (existingEntries == null) {
