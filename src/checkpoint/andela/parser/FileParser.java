@@ -1,5 +1,6 @@
 package checkpoint.andela.parser;
 
+import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.SynchronizedBuffer;
 import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.db.DbRecord;
@@ -12,18 +13,18 @@ public class FileParser implements Runnable {
 
     private FileReader fileReader;
 
-    private SynchronizedBuffer<DbRecord> dbRecordBuffer;
+    private Buffer<DbRecord> dbRecordBuffer;
 
     private BufferedReader bufferedReader;
 
-    public FileParser(String filePath) {
+    public FileParser(String filePath, Buffer<DbRecord> dbRecordBuffer) {
         this.dataFile = new File(filePath);
+        this.dbRecordBuffer = dbRecordBuffer;
     }
 
     public void parseFile() {
         try {
             fileReader = new FileReader(dataFile);
-            dbRecordBuffer = BufferFactory.getDbRecordBuffer();
             bufferedReader = new BufferedReader(fileReader);
             startLineByLineTraversal();
         } catch (IOException exception) {
