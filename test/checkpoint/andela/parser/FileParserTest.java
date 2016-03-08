@@ -13,19 +13,21 @@ import static org.junit.Assert.*;
 
 public class FileParserTest {
 
+    private FileParser fileParser;
+
     @Before
     public void beforeTestParseFile() {
         String filePath = "data/reactions.dat";
-        FileParser fileParser = new FileParser(filePath,
+        fileParser = new FileParser(filePath,
                 BufferFactory.getDbRecordBuffer());
-
-        (new Thread(fileParser)).run();
     }
 
     @Test
     public void testParseFile() throws Exception {
         Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
         String issuedKey = dbRecordBuffer.registerClientForTracking();
+
+        (new Thread(fileParser)).run();
 
         assertTrue(dbRecordBuffer.checkIfNewData(issuedKey));
 
