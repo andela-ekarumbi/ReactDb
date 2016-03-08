@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Buffer<T extends Object> {
+public class SynchronizedBuffer<T extends Object> {
 
     private List<T> list;
 
     private Map<String, Integer> lastAccessedTracker;
 
-    protected Buffer() {
+    protected SynchronizedBuffer() {
         list = new ArrayList<>();
         lastAccessedTracker = new HashMap<>();
     }
