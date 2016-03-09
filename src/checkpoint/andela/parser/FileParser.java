@@ -1,9 +1,8 @@
 package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
-import checkpoint.andela.buffer.SynchronizedBuffer;
-import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.utility.Utility;
 
 import java.io.*;
 
@@ -22,7 +21,7 @@ public class FileParser implements Runnable {
         this.dbRecordBuffer = dbRecordBuffer;
     }
 
-    public void parseFile() {
+    private void parseFile() {
         try {
             fileReader = new FileReader(dataFile);
             bufferedReader = new BufferedReader(fileReader);
@@ -42,10 +41,8 @@ public class FileParser implements Runnable {
         try {
             String currentLine = bufferedReader.readLine();
             while (!isNull(currentLine)) {
-                if (!isDelimiter(currentLine)) {
-                    if (!isComment(currentLine)) {
-                        addRecordToBuffer(currentLine);
-                    }
+                if (!isDelimiter(currentLine) && !isComment(currentLine)) {
+                    parseRecordStartingFrom(currentLine);
                 }
                 currentLine = bufferedReader.readLine();
             }
@@ -54,7 +51,7 @@ public class FileParser implements Runnable {
         }
     }
 
-    private void addRecordToBuffer(String currentLine) {
+    private void parseRecordStartingFrom(String currentLine) {
         try {
             DbRecord dbRecord = new DbRecord();
             while (!isNull(currentLine) && !isDelimiter(currentLine)) {
@@ -93,7 +90,9 @@ public class FileParser implements Runnable {
     private void extractKeyAndValue(String[] keyValueArray, DbRecord dbRecord) {
         String key = keyValueArray[0].trim();
         String value = keyValueArray[1].trim();
-        dbRecord.addColumn(key, value);
+        if (Utility.isValidColumn(key)) {
+            dbRecord.addColumn(key, value);
+        }
     }
 
     @Override

@@ -16,18 +16,19 @@ public class FileParserTest {
     private FileParser fileParser;
 
     @Before
-    public void beforeTestParseFile() {
+    public void beforeTestRun() {
         String filePath = "data/reactions.dat";
         fileParser = new FileParser(filePath,
                 BufferFactory.getDbRecordBuffer());
     }
 
     @Test
-    public void testParseFile() throws Exception {
+    public void testRun() throws Exception {
         Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
         String issuedKey = dbRecordBuffer.registerClientForTracking();
 
-        (new Thread(fileParser)).run();
+        Thread fileParserThread = new Thread(fileParser);
+        fileParserThread.run();
 
         assertTrue(dbRecordBuffer.checkIfNewData(issuedKey));
 
