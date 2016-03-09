@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class BufferTest {
+public class SynchronizedBufferTest {
 
     Runnable testRunnable;
 
@@ -17,7 +17,7 @@ public class BufferTest {
         testRunnable = new Runnable() {
             @Override
             public void run() {
-                Buffer<String> stringBuffer
+                SynchronizedBuffer<String> stringBuffer
                         = BufferFactory.getStringLogBuffer();
 
                 List<String> testList = new ArrayList<>();

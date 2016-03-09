@@ -1,23 +1,23 @@
 package checkpoint.andela.buffer;
 
-import checkpoint.andela.utility.DbRecord;
+import checkpoint.andela.db.DbRecord;
 
 public class BufferFactory {
 
-    private static Buffer<String> stringLogBuffer;
+    private static SynchronizedBuffer<String> stringLogBuffer;
 
-    private static Buffer<DbRecord> dbRecordBuffer;
+    private static SynchronizedBuffer<DbRecord> dbRecordBuffer;
 
-    public static Buffer<String> getStringLogBuffer() {
+    public static SynchronizedBuffer<String> getStringLogBuffer() {
         if (stringLogBuffer == null) {
-            stringLogBuffer = new Buffer<>();
+            stringLogBuffer = new SynchronizedBuffer<>();
         }
         return stringLogBuffer;
     }
 
-    public static Buffer<DbRecord> getDbRecordBuffer() {
+    public static SynchronizedBuffer<DbRecord> getDbRecordBuffer() {
         if (dbRecordBuffer == null) {
-            dbRecordBuffer = new Buffer<>();
+            dbRecordBuffer = new SynchronizedBuffer<>();
         }
         return dbRecordBuffer;
     }

@@ -1,17 +1,15 @@
-package checkpoint.andela.parser;
+package checkpoint.andela.db;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferFactory;
-import checkpoint.andela.db.DbRecord;
-
+import checkpoint.andela.config.Constants;
+import checkpoint.andela.parser.FileParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.*;
 
-public class FileParserTest {
+public class DBWriterTest {
 
     private FileParser fileParser;
 
@@ -24,22 +22,18 @@ public class FileParserTest {
 
     @Test
     public void testRun() throws Exception {
+        MyDbWriter myDbWriter = new MyDbWriter(Constants.MYSQL_DRIVER_NAME,
+                Constants.MYSQL_URL,
+                Constants.MYSQL_USERNAME,
+                Constants.MYSQL_PASSWORD,
+                Constants.MYSQL_TABLE_NAME);
+
         Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
-        String issuedKey = dbRecordBuffer.registerClientForTracking();
+        DBWriter writer = new DBWriter(dbRecordBuffer, myDbWriter);
 
         Thread fileParserThread = new Thread(fileParser);
+        Thread dbWriterThread = new Thread(writer);
         fileParserThread.run();
-
-        assertTrue(dbRecordBuffer.checkIfNewData(issuedKey));
-
-        List<DbRecord> records = dbRecordBuffer.getLatestData(issuedKey);
-        assertNotNull(records);
-        assertTrue(records.size() > 0);
-
-        DbRecord dbRecord = records.get(0);
-        assertNotNull(dbRecord);
-        assertTrue(dbRecord.getAllColumns().containsKey("UNIQUE-ID"));
-
-        assertFalse(dbRecordBuffer.checkIfNewData(issuedKey));
+        dbWriterThread.run();
     }
 }
