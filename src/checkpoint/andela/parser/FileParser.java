@@ -97,9 +97,9 @@ public class FileParser implements Runnable {
                 + currentThreadId
                 + " at "
                 + currentTime
-                + ": Wrote UNIQUE-ID "
+                + ": Collected UNIQUE-ID "
                 + recordUniqueId
-                + " to buffer.";
+                + " from file and wrote to buffer.";
     }
 
 
