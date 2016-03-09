@@ -5,6 +5,7 @@ import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.utility.Utility;
 
 import java.io.*;
+import java.util.Date;
 
 public class FileParser implements Runnable {
 
@@ -14,11 +15,16 @@ public class FileParser implements Runnable {
 
     private Buffer<DbRecord> dbRecordBuffer;
 
+    private Buffer<String> logBuffer;
+
     private BufferedReader bufferedReader;
 
-    public FileParser(String filePath, Buffer<DbRecord> dbRecordBuffer) {
+    public FileParser(String filePath,
+                      Buffer<DbRecord> dbRecordBuffer,
+                      Buffer<String> logBuffer) {
         this.dataFile = new File(filePath);
         this.dbRecordBuffer = dbRecordBuffer;
+        this.logBuffer = logBuffer;
     }
 
     private void parseFile() {
@@ -26,14 +32,19 @@ public class FileParser implements Runnable {
             fileReader = new FileReader(dataFile);
             bufferedReader = new BufferedReader(fileReader);
             startLineByLineTraversal();
+            reportEndOfInput();
         } catch (IOException exception) {
             exception.printStackTrace();
         } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
+            closeStreams();
+        }
+    }
+
+    private void closeStreams() {
+        try {
+            bufferedReader.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -51,6 +62,11 @@ public class FileParser implements Runnable {
         }
     }
 
+    private void reportEndOfInput() {
+        dbRecordBuffer.setInputEnded(true);
+        logBuffer.setInputEnded(true);
+    }
+
     private void parseRecordStartingFrom(String currentLine) {
         try {
             DbRecord dbRecord = new DbRecord();
@@ -61,10 +77,31 @@ public class FileParser implements Runnable {
                 currentLine = bufferedReader.readLine();
             }
             dbRecordBuffer.addToBuffer(dbRecord);
+            logRecordParsing(dbRecord);
         } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
+
+    private void logRecordParsing(DbRecord dbRecord) {
+        String logEntry = generateLogEntry(dbRecord);
+        logBuffer.addToBuffer(logEntry);
+    }
+
+    private String generateLogEntry(DbRecord dbRecord) {
+        String currentTime = (new Date()).toString();
+        String recordUniqueId
+                = dbRecord.getAllColumns().get("UNIQUE-ID").get(0);
+        String currentThreadId = Long.toString(Thread.currentThread().getId());
+        return "FileParser Thread #"
+                + currentThreadId
+                + " at "
+                + currentTime
+                + ": Wrote UNIQUE-ID "
+                + recordUniqueId
+                + " to buffer.";
+    }
+
 
     private boolean isDelimiter(String currentLine) {
         return currentLine.startsWith("//");

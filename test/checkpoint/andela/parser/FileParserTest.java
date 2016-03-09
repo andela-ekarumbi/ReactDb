@@ -18,8 +18,11 @@ public class FileParserTest {
     @Before
     public void beforeTestRun() {
         String filePath = "data/reactions.dat";
-        fileParser = new FileParser(filePath,
-                BufferFactory.getDbRecordBuffer());
+
+        Buffer<DbRecord> recordBuffer = BufferFactory.getDbRecordBuffer();
+        Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
+
+        fileParser = new FileParser(filePath, recordBuffer, logBuffer);
     }
 
     @Test
@@ -30,7 +33,7 @@ public class FileParserTest {
         Thread fileParserThread = new Thread(fileParser);
         fileParserThread.run();
 
-        assertTrue(dbRecordBuffer.checkIfNewData(issuedKey));
+        assertTrue(dbRecordBuffer.isThereNewData(issuedKey));
 
         List<DbRecord> records = dbRecordBuffer.getLatestData(issuedKey);
         assertNotNull(records);
@@ -40,6 +43,6 @@ public class FileParserTest {
         assertNotNull(dbRecord);
         assertTrue(dbRecord.getAllColumns().containsKey("UNIQUE-ID"));
 
-        assertFalse(dbRecordBuffer.checkIfNewData(issuedKey));
+        assertFalse(dbRecordBuffer.isThereNewData(issuedKey));
     }
 }
