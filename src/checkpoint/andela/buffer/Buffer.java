@@ -9,7 +9,11 @@ public interface Buffer<T extends Object> {
 
     String registerClientForTracking();
 
-    boolean checkIfNewData(String issuedKey);
+    boolean isThereNewData(String issuedKey);
 
     List<T> getLatestData(String issuedKey);
+
+    boolean isInputEnded();
+
+    void setInputEnded(boolean inputEnded);
 }

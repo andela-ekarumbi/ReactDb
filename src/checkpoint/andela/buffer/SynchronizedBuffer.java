@@ -11,6 +11,8 @@ public class SynchronizedBuffer<T extends Object> implements Buffer<T> {
 
     private Map<String, Integer> lastAccessedTracker;
 
+    private boolean isInputEnded = false;
+
     protected SynchronizedBuffer() {
         list = new ArrayList<>();
         lastAccessedTracker = new HashMap<>();
@@ -48,7 +50,7 @@ public class SynchronizedBuffer<T extends Object> implements Buffer<T> {
     }
 
     @Override
-    public boolean checkIfNewData(String issuedKey) {
+    public boolean isThereNewData(String issuedKey) {
         synchronized (this) {
             return checkIfKeyExists(issuedKey) && checkForNewData(issuedKey);
         }
@@ -71,6 +73,16 @@ public class SynchronizedBuffer<T extends Object> implements Buffer<T> {
             }
             return latestData;
         }
+    }
+
+    @Override
+    public boolean isInputEnded() {
+        return isInputEnded;
+    }
+
+    @Override
+    public void setInputEnded(boolean inputEnded) {
+        this.isInputEnded = inputEnded;
     }
 
     private void getLatestBatch(String issuedkey, List<T> latestBatch) {

@@ -42,13 +42,13 @@ public class SynchronizedBufferTest {
         String trackingKey = buffer.registerClientForTracking();
         assertNotNull(trackingKey);
 
-        boolean isNewDataAvailable = buffer.checkIfNewData(trackingKey);
+        boolean isNewDataAvailable = buffer.isThereNewData(trackingKey);
         assertTrue(isNewDataAvailable);
 
         List<String> newData = buffer.getLatestData(trackingKey);
         assertNotNull(newData);
         assertTrue(newData.size() > 0);
 
-        assertFalse(buffer.checkIfNewData(trackingKey));
+        assertFalse(buffer.isThereNewData(trackingKey));
     }
 }
