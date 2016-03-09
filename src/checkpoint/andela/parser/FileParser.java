@@ -64,7 +64,6 @@ public class FileParser implements Runnable {
 
     private void reportEndOfInput() {
         dbRecordBuffer.setInputEnded(true);
-        logBuffer.setInputEnded(true);
     }
 
     private void parseRecordStartingFrom(String currentLine) {
@@ -77,29 +76,17 @@ public class FileParser implements Runnable {
                 currentLine = bufferedReader.readLine();
             }
             dbRecordBuffer.addToBuffer(dbRecord);
-            logRecordParsing(dbRecord);
+            writeLog(dbRecord);
         } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
 
-    private void logRecordParsing(DbRecord dbRecord) {
-        String logEntry = generateLogEntry(dbRecord);
+    private void writeLog(DbRecord dbRecord) {
+        String entryTermination = " from file and wrote to buffer.";
+        String logEntry
+                = Utility.generateLogMessage(dbRecord, entryTermination);
         logBuffer.addToBuffer(logEntry);
-    }
-
-    private String generateLogEntry(DbRecord dbRecord) {
-        String currentTime = (new Date()).toString();
-        String recordUniqueId
-                = dbRecord.getAllColumns().get("UNIQUE-ID").get(0);
-        String currentThreadId = Long.toString(Thread.currentThread().getId());
-        return "FileParser Thread #"
-                + currentThreadId
-                + " at "
-                + currentTime
-                + ": Collected UNIQUE-ID "
-                + recordUniqueId
-                + " from file and wrote to buffer.";
     }
 
 
