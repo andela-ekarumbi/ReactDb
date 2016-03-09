@@ -16,8 +16,11 @@ public class DBWriterTest {
     @Before
     public void beforeTestRun() {
         String filePath = "data/reactions.dat";
-        fileParser = new FileParser(filePath,
-                BufferFactory.getDbRecordBuffer());
+
+        Buffer<DbRecord> recordBuffer = BufferFactory.getDbRecordBuffer();
+        Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
+
+        fileParser = new FileParser(filePath, recordBuffer, logBuffer);
     }
 
     @Test
@@ -29,7 +32,8 @@ public class DBWriterTest {
                 Constants.MYSQL_TABLE_NAME);
 
         Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
-        DBWriter writer = new DBWriter(dbRecordBuffer, myDbWriter);
+        Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
+        DBWriter writer = new DBWriter(dbRecordBuffer, myDbWriter, logBuffer);
 
         Thread fileParserThread = new Thread(fileParser);
         Thread dbWriterThread = new Thread(writer);

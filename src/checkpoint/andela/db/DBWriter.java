@@ -8,18 +8,18 @@ import java.util.List;
 
 public class DBWriter implements Runnable {
     private Buffer<DbRecord> dbRecordBuffer;
+    private Buffer<String> logBuffer;
 
     private MyDbWriter dbWriter;
 
-    private final int MAX_POLLS = 100;
-
-    private int pollCount = 0;
-
     private String bufferTrackingKey;
 
-    public DBWriter(Buffer<DbRecord> buffer, MyDbWriter writer) {
+    public DBWriter(Buffer<DbRecord> buffer,
+                    MyDbWriter writer,
+                    Buffer<String> logBuffer) {
         this.dbRecordBuffer = buffer;
         this.dbWriter = writer;
+        this.logBuffer = logBuffer;
 
         bufferTrackingKey = buffer.registerClientForTracking();
     }
@@ -30,11 +30,10 @@ public class DBWriter implements Runnable {
     }
 
     private void startWorking() {
-        while (pollCount <= MAX_POLLS) {
+        while (!dbRecordBuffer.isInputEnded()) {
             try {
                 Thread.sleep(50L);
                 getRecordsFromBuffer();
-                pollCount++;
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -50,6 +49,15 @@ public class DBWriter implements Runnable {
     private void writeRecordsToDatabase(List<DbRecord> latestRecords) {
         for (DbRecord record : latestRecords) {
             dbWriter.addNewDbRecord(record);
+            writeLog(record);
         }
+        logBuffer.setInputEnded(true);
+    }
+
+    private void writeLog(DbRecord record) {
+        String messageTermination = " from buffer and wrote to database.";
+        String logMessage
+                = Utility.generateLogMessage(record,messageTermination);
+        logBuffer.addToBuffer(logMessage);
     }
 }
