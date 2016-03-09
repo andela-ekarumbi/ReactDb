@@ -41,7 +41,6 @@ public class MyDbWriter {
 
         try {
             String sqlString = getInsertStatement(dbRecord);
-            System.out.println(sqlString);
 
             initializeResources();
 
@@ -51,8 +50,9 @@ public class MyDbWriter {
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
-
+            finalizeResources();
         }
+
         return success;
     }
 
@@ -62,6 +62,15 @@ public class MyDbWriter {
                     dbUsername,
                     dbPassword);
             statement = connection.createStatement();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void finalizeResources() {
+        try {
+            statement.close();
+            connection.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -78,6 +87,26 @@ public class MyDbWriter {
                 .append(") VALUES (")
                 .append(getColumnValuesString(columns))
                 .append(");");
+
+        return stringBuilder.toString();
+    }
+
+    private String getColumnNameString(Set<String> columnNames) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int count = columnNames.size();
+
+        Object[] columnArray = columnNames.toArray();
+
+        for (int i = 0; i < count; i++) {
+            String columnName = (String)columnArray[i];
+            stringBuilder.append("`")
+                    .append(columnName)
+                    .append("`");
+
+            if (i < count - 1) {
+                stringBuilder.append(", ");
+            }
+        }
 
         return stringBuilder.toString();
     }
@@ -121,26 +150,6 @@ public class MyDbWriter {
 
             stringBuilder.append("'");
         }
-    }
-
-    private String getColumnNameString(Set<String> columnNames) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int count = columnNames.size();
-
-        Object[] columnArray = columnNames.toArray();
-
-        for (int i = 0; i < count; i++) {
-            String columnName = (String)columnArray[i];
-            stringBuilder.append("`")
-                    .append(columnName)
-                    .append("`");
-
-            if (i < count - 1) {
-                stringBuilder.append(", ");
-            }
-        }
-
-        return stringBuilder.toString();
     }
 
     private void registerDbDriver() {
