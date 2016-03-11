@@ -5,7 +5,6 @@ import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.utility.Utility;
 
 import java.io.*;
-import java.util.Date;
 
 public class FileParser implements Runnable {
 
@@ -27,12 +26,17 @@ public class FileParser implements Runnable {
         this.logBuffer = logBuffer;
     }
 
+    @Override
+    public void run() {
+        Thread.currentThread().setName("FileParser Thread");
+        parseFile();
+    }
+
     private void parseFile() {
         try {
             fileReader = new FileReader(dataFile);
             bufferedReader = new BufferedReader(fileReader);
             startLineByLineTraversal();
-            reportEndOfInput();
         } catch (IOException exception) {
             exception.printStackTrace();
         } finally {
@@ -62,10 +66,6 @@ public class FileParser implements Runnable {
         }
     }
 
-    private void reportEndOfInput() {
-        dbRecordBuffer.setInputEnded(true);
-    }
-
     private void parseRecordStartingFrom(String currentLine) {
         try {
             DbRecord dbRecord = new DbRecord();
@@ -85,7 +85,8 @@ public class FileParser implements Runnable {
     private void writeLog(DbRecord dbRecord) {
         String entryTermination = " from file and wrote to buffer.";
         String logEntry
-                = Utility.generateLogMessage(dbRecord, entryTermination);
+                = Utility.generateLogMessage(dbRecord, entryTermination,
+                "FileParser Thread");
         logBuffer.addToBuffer(logEntry);
     }
 
@@ -117,10 +118,5 @@ public class FileParser implements Runnable {
         if (Utility.isValidColumn(key)) {
             dbRecord.addColumn(key, value);
         }
-    }
-
-    @Override
-    public void run() {
-        parseFile();
     }
 }
