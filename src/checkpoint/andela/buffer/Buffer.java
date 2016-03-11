@@ -2,7 +2,7 @@ package checkpoint.andela.buffer;
 
 import java.util.List;
 
-public interface Buffer<T extends Object> {
+public interface Buffer<T> {
     void addToBuffer(T item);
 
     void addListToBuffer(List<T> itemsList);
@@ -12,8 +12,4 @@ public interface Buffer<T extends Object> {
     boolean isThereNewData(String issuedKey);
 
     List<T> getLatestData(String issuedKey);
-
-    boolean isInputEnded();
-
-    void setInputEnded(boolean inputEnded);
 }
