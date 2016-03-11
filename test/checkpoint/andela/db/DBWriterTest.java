@@ -5,6 +5,7 @@ import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.config.Constants;
 import checkpoint.andela.parser.FileParser;
 
+import checkpoint.andela.utility.Utility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,9 +39,15 @@ public class DBWriterTest {
         Thread fileParserThread = new Thread(fileParser);
         Thread dbWriterThread = new Thread(writer);
 
+        int countBeforeWrite = Utility.getDbRecordCount();
+
         Thread.currentThread().setName("Test thread");
 
         fileParserThread.run();
         dbWriterThread.run();
+
+        int countAfterWrite = Utility.getDbRecordCount();
+
+        assertTrue(countAfterWrite > countBeforeWrite);
     }
 }

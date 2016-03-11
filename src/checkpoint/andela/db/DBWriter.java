@@ -67,9 +67,9 @@ public class DBWriter implements Runnable {
         }
 
         private void writeRecordsToDatabase(List<DbRecord> latestRecords) {
+            dbWriter.addRecords(latestRecords);
             for (DbRecord record : latestRecords) {
                 writeLog(record);
-                dbWriter.addNewDbRecord(record);
             }
         }
 

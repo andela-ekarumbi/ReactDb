@@ -9,9 +9,12 @@ import checkpoint.andela.db.MyDbWriter;
 import checkpoint.andela.log.LogWriter;
 import checkpoint.andela.parser.FileParser;
 
+import checkpoint.andela.utility.Utility;
 import org.junit.Test;
 
 import java.util.Date;
+
+import static org.junit.Assert.*;
 
 public class IntegratedTest {
     @Test
@@ -21,6 +24,8 @@ public class IntegratedTest {
         String logFileName = "logs/logFile-"
                 + (new Date()).toString()
                 + ".txt";
+
+        int countBeforeWrite = Utility.getDbRecordCount();
 
         Buffer<DbRecord> recordBuffer = BufferFactory.getDbRecordBuffer();
         Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
@@ -45,5 +50,9 @@ public class IntegratedTest {
         fileParserThread.run();
         logWriterThread.run();
         dbWriterThread.run();
+
+        int countAfterWrite = Utility.getDbRecordCount();
+
+        assertTrue(countAfterWrite > countBeforeWrite);
     }
 }

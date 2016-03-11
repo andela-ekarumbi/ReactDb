@@ -4,6 +4,9 @@ import checkpoint.andela.config.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class MyDbWriterTest {
@@ -16,7 +19,7 @@ public class MyDbWriterTest {
     }
 
     @Before
-    public void beforeTestAddNewDbRecord() {
+    public void beforeTestAddRecords() {
         dbRecord = new DbRecord();
         testId = generateId();
         dbRecord.addColumn("UNIQUE-ID", testId);
@@ -38,13 +41,16 @@ public class MyDbWriterTest {
     }
 
     @Test
-    public void testAddNewDbRecord() throws Exception {
+    public void testAddRecords() throws Exception {
         MyDbWriter writer = new MyDbWriter(Constants.MYSQL_DRIVER_NAME,
                 Constants.MYSQL_URL,
                 Constants.MYSQL_USERNAME,
                 Constants.MYSQL_PASSWORD,
                 Constants.MYSQL_TABLE_NAME);
 
-        assertTrue(writer.addNewDbRecord(dbRecord));
+        List<DbRecord> records = new ArrayList<>();
+        records.add(dbRecord);
+
+        assertTrue(writer.addRecords(records));
     }
 }
