@@ -1,3 +1,8 @@
+/**
+ * This class is an implementation of the {@code Buffer} interface that has
+ * been designed for concurrent access by multiple threads.
+ * */
+
 package checkpoint.andela.buffer;
 
 import java.util.ArrayList;
@@ -48,24 +53,24 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
     }
 
     @Override
-    public synchronized boolean isThereNewData(String issuedKey) {
-        return checkIfKeyExists(issuedKey) && checkForNewData(issuedKey);
+    public synchronized boolean isThereNewData(String trackingKey) {
+        return isKeyRegistered(trackingKey) && isNewDataPresent(trackingKey);
     }
 
-    private boolean checkIfKeyExists(String issuedKey) {
+    private boolean isKeyRegistered(String issuedKey) {
         return lastAccessedTracker.containsKey(issuedKey);
     }
 
-    private boolean checkForNewData(String issuedKey) {
+    private boolean isNewDataPresent(String issuedKey) {
         return list.size() > 0 &&
                 lastAccessedTracker.get(issuedKey) < lastAccessedTracker.size();
     }
 
     @Override
-    public synchronized List<T> getLatestData(String issuedKey) {
+    public synchronized List<T> getLatestData(String trackingKey) {
         List<T> latestData = new ArrayList<>();
-        if (checkIfKeyExists(issuedKey)) {
-            getLatestBatch(issuedKey, latestData);
+        if (isKeyRegistered(trackingKey)) {
+            getLatestBatch(trackingKey, latestData);
         }
         return latestData;
     }

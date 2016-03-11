@@ -1,15 +1,13 @@
 package checkpoint.andela.log;
 
 import checkpoint.andela.buffer.Buffer;
-import checkpoint.andela.buffer.BufferFactory;
+import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.parser.FileParser;
 
 import org.junit.Test;
 
 import java.util.Date;
-
-import static org.junit.Assert.*;
 
 public class LogWriterTest {
 
@@ -19,8 +17,8 @@ public class LogWriterTest {
                 + (new Date()).toString()
                 + ".txt";
 
-        Buffer<DbRecord> dbRecordBuffer = BufferFactory.getDbRecordBuffer();
-        Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
+        Buffer<DbRecord> dbRecordBuffer = BufferSingletons.getDbRecordBuffer();
+        Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
         FileParser fileParser
                 = new FileParser("data/reactions.dat", dbRecordBuffer, logBuffer);

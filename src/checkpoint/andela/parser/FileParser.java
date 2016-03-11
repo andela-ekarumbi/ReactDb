@@ -1,3 +1,9 @@
+/**
+ * This class parses an attribute-value data file, extracts individual records
+ * and writes them to a temporary records buffer, while writing log messages to
+ * a temporary log buffer.
+ * */
+
 package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
@@ -17,6 +23,13 @@ public class FileParser implements Runnable {
     private Buffer<String> logBuffer;
 
     private BufferedReader bufferedReader;
+
+    /**
+     * Creates a new {@code FileParser}
+     * @param filePath the path to the data file.
+     * @param dbRecordBuffer the temporary records buffer.
+     * @param logBuffer the temporary log buffer.
+     * */
 
     public FileParser(String filePath,
                       Buffer<DbRecord> dbRecordBuffer,

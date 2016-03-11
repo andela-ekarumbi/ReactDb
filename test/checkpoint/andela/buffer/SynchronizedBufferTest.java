@@ -18,7 +18,7 @@ public class SynchronizedBufferTest {
             @Override
             public void run() {
                 SynchronizedBuffer<String> stringBuffer
-                        = BufferFactory.getStringLogBuffer();
+                        = BufferSingletons.getStringLogBuffer();
 
                 List<String> testList = new ArrayList<>();
                 testList.add("Lorem");
@@ -37,7 +37,7 @@ public class SynchronizedBufferTest {
     public void testAddListToBuffer() throws Exception {
         Thread.sleep(1000);
 
-        Buffer<String> buffer = BufferFactory.getStringLogBuffer();
+        Buffer<String> buffer = BufferSingletons.getStringLogBuffer();
 
         String trackingKey = buffer.registerClientForTracking();
         assertTrue(buffer.isThereNewData(trackingKey));

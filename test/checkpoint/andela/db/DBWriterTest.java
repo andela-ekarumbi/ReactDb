@@ -1,7 +1,7 @@
 package checkpoint.andela.db;
 
 import checkpoint.andela.buffer.Buffer;
-import checkpoint.andela.buffer.BufferFactory;
+import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.config.Constants;
 import checkpoint.andela.parser.FileParser;
 
@@ -22,8 +22,8 @@ public class DBWriterTest {
     public void beforeTestRun() {
         String filePath = "data/react.dat";
 
-        Buffer<DbRecord> recordBuffer = BufferFactory.getDbRecordBuffer();
-        Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
+        Buffer<DbRecord> recordBuffer = BufferSingletons.getDbRecordBuffer();
+        Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
         MyDbWriter myDbWriter = new MyDbWriter(Constants.MYSQL_DRIVER_NAME,
                 Constants.MYSQL_URL,

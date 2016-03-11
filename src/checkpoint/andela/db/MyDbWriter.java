@@ -1,6 +1,9 @@
-package checkpoint.andela.db;
+/**
+ * This class packages logic for writing data from a list of {@code DbRecord}
+ * into an SQL database.
+ * */
 
-import checkpoint.andela.config.Constants;
+package checkpoint.andela.db;
 
 import java.sql.*;
 import java.util.*;
@@ -21,6 +24,16 @@ public class MyDbWriter {
 
     private Statement statement;
 
+    /**
+     * Creates a new {@code MyDbWriter}.
+     * @param dbDriverName the package name of the database driver to be used.
+     * @param dbUrl the url of the database to be accessed.
+     * @param dbUsername the username of the database account to be used.
+     * @param dbPassword the password of the database account to be used.
+     * @param dbTableName the name of the database table where records are
+     * going to be written to.
+     * */
+
     public MyDbWriter(String dbDriverName,
                       String dbUrl,
                       String dbUsername,
@@ -35,6 +48,13 @@ public class MyDbWriter {
 
         registerDbDriver();
     }
+
+    /**
+     * Adds a list of records to the database.
+     * @param dbRecords the list of {@code DbRecord} objects to be added.
+     * @return true for a successful operation, or false otherwise.
+     * */
+
     public boolean addRecords(List<DbRecord> dbRecords) {
         boolean success = false;
 
