@@ -14,11 +14,22 @@ public class FileParser implements Runnable {
 
     private Buffer<DbRecord> dbRecordBuffer;
 
+    private Buffer<String> logBuffer;
+
     private BufferedReader bufferedReader;
 
-    public FileParser(String filePath, Buffer<DbRecord> dbRecordBuffer) {
+    public FileParser(String filePath,
+                      Buffer<DbRecord> dbRecordBuffer,
+                      Buffer<String> logBuffer) {
         this.dataFile = new File(filePath);
         this.dbRecordBuffer = dbRecordBuffer;
+        this.logBuffer = logBuffer;
+    }
+
+    @Override
+    public void run() {
+        Thread.currentThread().setName("FileParser Thread");
+        parseFile();
     }
 
     private void parseFile() {
@@ -29,11 +40,15 @@ public class FileParser implements Runnable {
         } catch (IOException exception) {
             exception.printStackTrace();
         } finally {
-            try {
-                bufferedReader.close();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
+            closeStreams();
+        }
+    }
+
+    private void closeStreams() {
+        try {
+            bufferedReader.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -61,9 +76,18 @@ public class FileParser implements Runnable {
                 currentLine = bufferedReader.readLine();
             }
             dbRecordBuffer.addToBuffer(dbRecord);
+            writeLog(dbRecord);
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+    private void writeLog(DbRecord dbRecord) {
+        String entryTermination = " from file and wrote to buffer.";
+        String logEntry
+                = Utility.generateLogMessage(dbRecord, entryTermination,
+                "FileParser Thread");
+        logBuffer.addToBuffer(logEntry);
     }
 
     private boolean isDelimiter(String currentLine) {
@@ -93,10 +117,5 @@ public class FileParser implements Runnable {
         if (Utility.isValidColumn(key)) {
             dbRecord.addColumn(key, value);
         }
-    }
-
-    @Override
-    public void run() {
-        parseFile();
     }
 }

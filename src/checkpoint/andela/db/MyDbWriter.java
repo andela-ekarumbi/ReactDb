@@ -35,12 +35,12 @@ public class MyDbWriter {
 
         registerDbDriver();
     }
-
-    public boolean addNewDbRecord(DbRecord dbRecord) {
+    public boolean addRecords(List<DbRecord> dbRecords) {
         boolean success = false;
 
         try {
-            String sqlString = getInsertStatement(dbRecord);
+            String sqlString = getInsertStatement(dbRecords);
+            System.out.println(sqlString);
 
             initializeResources();
 
@@ -76,18 +76,18 @@ public class MyDbWriter {
         }
     }
 
-    private String getInsertStatement(DbRecord record) {
-        Map<String, List<String>> columns = record.getAllColumns();
-
+    private String getInsertStatement(List<DbRecord> records) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("INSERT INTO ")
-                .append(dbTableName)
-                .append(" (")
-                .append(getColumnNameString(columns.keySet()))
-                .append(") VALUES (")
-                .append(getColumnValuesString(columns))
-                .append(");");
-
+        for (DbRecord record : records) {
+            Map<String, List<String>> columns = record.getAllColumns();
+            stringBuilder.append("\nINSERT INTO ")
+                    .append(dbTableName)
+                    .append(" (")
+                    .append(getColumnNameString(columns.keySet()))
+                    .append(") VALUES (")
+                    .append(getColumnValuesString(columns))
+                    .append(");");
+        }
         return stringBuilder.toString();
     }
 

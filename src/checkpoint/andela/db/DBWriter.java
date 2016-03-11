@@ -6,50 +6,78 @@ import checkpoint.andela.utility.Utility;
 
 import java.util.List;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class DBWriter implements Runnable {
-    private Buffer<DbRecord> dbRecordBuffer;
+    private ScheduledWrite scheduledWrite;
 
-    private MyDbWriter dbWriter;
+    private Timer timer;
 
-    private final int MAX_POLLS = 100;
-
-    private int pollCount = 0;
-
-    private String bufferTrackingKey;
-
-    public DBWriter(Buffer<DbRecord> buffer, MyDbWriter writer) {
-        this.dbRecordBuffer = buffer;
-        this.dbWriter = writer;
-
-        bufferTrackingKey = buffer.registerClientForTracking();
+    public DBWriter(Buffer<DbRecord> buffer,
+                    MyDbWriter writer,
+                    Buffer<String> logBuffer) {
+        scheduledWrite = new ScheduledWrite(buffer, writer, logBuffer);
     }
 
     @Override
     public void run() {
-        startWorking();
+        timer = new Timer();
+        timer.schedule(scheduledWrite, 0, 10);
     }
 
-    private void startWorking() {
-        while (pollCount <= MAX_POLLS) {
+    private class ScheduledWrite extends TimerTask {
+        private Buffer<DbRecord> dbRecordBuffer;
+        private Buffer<String> logBuffer;
+
+        private MyDbWriter dbWriter;
+
+        private String bufferTrackingKey;
+
+        public ScheduledWrite(Buffer<DbRecord> buffer,
+                              MyDbWriter writer,
+                              Buffer<String> logBuffer) {
+            this.dbRecordBuffer = buffer;
+            this.dbWriter = writer;
+            this.logBuffer = logBuffer;
+
+            bufferTrackingKey = dbRecordBuffer.registerClientForTracking();
+        }
+
+        @Override
+        public void run() {
+            startWorking();
+        }
+
+        private void startWorking() {
             try {
-                Thread.sleep(50L);
                 getRecordsFromBuffer();
-                pollCount++;
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
-    }
 
-    private void getRecordsFromBuffer() {
-        List<DbRecord> latestRecords
-                = dbRecordBuffer.getLatestData(bufferTrackingKey);
-        writeRecordsToDatabase(latestRecords);
-    }
+        private void getRecordsFromBuffer() {
+            if (dbRecordBuffer.isThereNewData(bufferTrackingKey)) {
+                List<DbRecord> latestRecords
+                        = dbRecordBuffer.getLatestData(bufferTrackingKey);
+                writeRecordsToDatabase(latestRecords);
+            }
+        }
 
-    private void writeRecordsToDatabase(List<DbRecord> latestRecords) {
-        for (DbRecord record : latestRecords) {
-            dbWriter.addNewDbRecord(record);
+        private void writeRecordsToDatabase(List<DbRecord> latestRecords) {
+            dbWriter.addRecords(latestRecords);
+            for (DbRecord record : latestRecords) {
+                writeLog(record);
+            }
+        }
+
+        private void writeLog(DbRecord record) {
+            String messageTermination = " from buffer and wrote to database.";
+            String logMessage
+                    = Utility.generateLogMessage(record, messageTermination,
+                    "DBWriter Thread");
+            logBuffer.addToBuffer(logMessage);
         }
     }
 }

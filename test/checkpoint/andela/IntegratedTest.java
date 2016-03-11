@@ -1,26 +1,31 @@
-package checkpoint.andela.db;
+package checkpoint.andela;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferFactory;
 import checkpoint.andela.config.Constants;
+import checkpoint.andela.db.DBWriter;
+import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.db.MyDbWriter;
+import checkpoint.andela.log.LogWriter;
 import checkpoint.andela.parser.FileParser;
 
 import checkpoint.andela.utility.Utility;
-
-import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class DBWriterTest {
+public class IntegratedTest {
+    @Test
+    public void integratedTest() throws Exception {
+        String filePath = "data/reactions.dat";
 
-    private FileParser fileParser;
+        String logFileName = "logs/logFile-"
+                + (new Date()).toString()
+                + ".txt";
 
-    private DBWriter writer;
-
-    @Before
-    public void beforeTestRun() {
-        String filePath = "data/react.dat";
+        int countBeforeWrite = Utility.getDbRecordCount();
 
         Buffer<DbRecord> recordBuffer = BufferFactory.getDbRecordBuffer();
         Buffer<String> logBuffer = BufferFactory.getStringLogBuffer();
@@ -31,21 +36,19 @@ public class DBWriterTest {
                 Constants.MYSQL_PASSWORD,
                 Constants.MYSQL_TABLE_NAME);
 
-        writer = new DBWriter(recordBuffer, myDbWriter, logBuffer);
+        DBWriter writer = new DBWriter(recordBuffer, myDbWriter, logBuffer);
 
-        fileParser = new FileParser(filePath, recordBuffer, logBuffer);
-    }
+        FileParser fileParser = new FileParser(filePath,
+                recordBuffer, logBuffer);
 
-    @Test
-    public void testRun() throws Exception {
+        LogWriter logWriter = new LogWriter(logBuffer, logFileName);
+
         Thread fileParserThread = new Thread(fileParser);
         Thread dbWriterThread = new Thread(writer);
-
-        int countBeforeWrite = Utility.getDbRecordCount();
-
-        Thread.currentThread().setName("Test thread");
+        Thread logWriterThread = new Thread(logWriter);
 
         fileParserThread.run();
+        logWriterThread.run();
         dbWriterThread.run();
 
         int countAfterWrite = Utility.getDbRecordCount();
