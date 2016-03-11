@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Utility {
-    public static boolean isValidColumn(String columnName)  {
+
+   public static boolean isValidColumn(String columnName)  {
         Arrays.sort(Constants.ALLOWED_ATTRIBUTES);
         int foundPosition
                 = Arrays.binarySearch(Constants.ALLOWED_ATTRIBUTES, columnName);
@@ -17,16 +18,18 @@ public class Utility {
     }
 
     public static String generateLogMessage(DbRecord record,
-                                            String termination) {
+                                            String termination,
+                                            String threadName) {
         String currentTime = (new Date()).toString();
         String recordUniqueId
                 = record.getAllColumns().get("UNIQUE-ID").get(0);
         String currentThreadId = Long.toString(Thread.currentThread().getId());
-        return "FileParser Thread #"
+        return threadName
+                + " #"
                 + currentThreadId
                 + " at "
                 + currentTime
-                + ": Collected UNIQUE-ID "
+                + ": Got UNIQUE-ID "
                 + recordUniqueId
                 + termination;
     }
