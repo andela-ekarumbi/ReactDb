@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class IntegratedTest {
     @Test
     public void integratedTest() throws Exception {
-        String filePath = "data/reactions.dat";
+        String filePath = "data/react.dat";
 
         String logFileName = "logs/logFile-"
                 + (new Date()).toString()
@@ -52,7 +52,6 @@ public class IntegratedTest {
         dbWriterThread.run();
 
         int countAfterWrite = Utility.getDbRecordCount();
-
         assertTrue(countAfterWrite > countBeforeWrite);
     }
 }

@@ -1,7 +1,7 @@
 /**
  * This class provides two buffer objects as singletons, to simplify access to
  * them throughout the entire application.
- * */
+ */
 
 package checkpoint.andela.buffer;
 

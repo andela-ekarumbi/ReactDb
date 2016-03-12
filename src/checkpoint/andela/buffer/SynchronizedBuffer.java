@@ -1,7 +1,7 @@
 /**
  * This class is an implementation of the {@code Buffer} interface that has
  * been designed for concurrent access by multiple threads.
- * */
+ */
 
 package checkpoint.andela.buffer;
 

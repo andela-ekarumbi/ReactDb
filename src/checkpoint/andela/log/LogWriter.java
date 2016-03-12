@@ -1,6 +1,6 @@
 /**
  * This class fetches log messages from a log buffer and writes them to a file.
- * */
+ */
 
 package checkpoint.andela.log;
 
@@ -27,7 +27,7 @@ public class LogWriter implements Runnable {
      * */
 
     public LogWriter(Buffer<String> logBuffer, String logFilePath) {
-        scheduledLog = new ScheduledLog(logBuffer,logFilePath);
+        scheduledLog = new ScheduledLog(logBuffer, logFilePath);
     }
 
     @Override

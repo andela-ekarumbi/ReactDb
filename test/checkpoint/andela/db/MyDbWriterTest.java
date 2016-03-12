@@ -1,8 +1,10 @@
 package checkpoint.andela.db;
 
 import checkpoint.andela.config.Constants;
+import checkpoint.andela.utility.Utility;
 import org.junit.Before;
 import org.junit.Test;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ public class MyDbWriterTest {
     }
 
     @Before
-public void beforeTestAddRecords() {
+    public void beforeTestAddRecords() {
         dbRecord = new DbRecord();
         testId = generateId();
         dbRecord.addColumn("UNIQUE-ID", testId);
@@ -48,9 +50,14 @@ public void beforeTestAddRecords() {
                 Constants.MYSQL_PASSWORD,
                 Constants.MYSQL_TABLE_NAME);
 
+        int countBeforeWrite = Utility.getDbRecordCount();
+
         List<DbRecord> records = new ArrayList<>();
         records.add(dbRecord);
 
         assertTrue(writer.addRecords(records));
+
+        int countAfterWrite = Utility.getDbRecordCount();
+        assertTrue(countAfterWrite > countBeforeWrite);
     }
 }

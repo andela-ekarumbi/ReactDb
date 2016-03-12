@@ -2,7 +2,7 @@
  * This class provides a generic implementation of a database record. It
  * assumes that all the fields will contain strings and that each field may
  * store zero or more values.
- * */
+ */
 
 package checkpoint.andela.db;
 

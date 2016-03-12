@@ -1,7 +1,7 @@
 /**
  * This class packages logic for writing data from a list of {@code DbRecord}
  * into an SQL database.
- * */
+ */
 
 package checkpoint.andela.db;
 
@@ -118,7 +118,7 @@ public class MyDbWriter {
         Object[] columnArray = columnNames.toArray();
 
         for (int i = 0; i < count; i++) {
-            String columnName = (String)columnArray[i];
+            String columnName = (String) columnArray[i];
             stringBuilder.append("`")
                     .append(columnName)
                     .append("`");
@@ -150,7 +150,7 @@ public class MyDbWriter {
     }
 
     private void appendColumnValues(StringBuilder stringBuilder,
-                                   List<String> columnValues) {
+                                    List<String> columnValues) {
         int valuesCount = columnValues.size();
 
         if (valuesCount == 0) {
@@ -174,8 +174,8 @@ public class MyDbWriter {
 
     private void registerDbDriver() {
         try {
-            Class.forName(dbDiverName);
-        } catch (ClassNotFoundException exception) {
+            Class.forName(dbDiverName).newInstance();
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
     }

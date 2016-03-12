@@ -1,7 +1,7 @@
 /**
  * This class gets records from a temporary records buffer and writes them to a
  * database, while writing log messages to a temporary log buffer.
- * */
+ */
 
 package checkpoint.andela.db;
 

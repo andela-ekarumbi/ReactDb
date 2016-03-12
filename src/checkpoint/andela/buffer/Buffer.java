@@ -1,6 +1,6 @@
 /**
  * This interface defines operations to be implemented by a buffer.
- * */
+ */
 
 package checkpoint.andela.buffer;
 

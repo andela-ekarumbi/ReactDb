@@ -2,7 +2,7 @@
  * This class parses an attribute-value data file, extracts individual records
  * and writes them to a temporary records buffer, while writing log messages to
  * a temporary log buffer.
- * */
+ */
 
 package checkpoint.andela.parser;
 
