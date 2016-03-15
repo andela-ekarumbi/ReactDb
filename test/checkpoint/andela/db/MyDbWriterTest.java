@@ -55,7 +55,7 @@ public class MyDbWriterTest {
         List<DbRecord> records = new ArrayList<>();
         records.add(dbRecord);
 
-        assertTrue(writer.addRecords(records));
+        assertTrue(writer.writeRecords(records));
 
         int countAfterWrite = Utility.getDbRecordCount();
         assertTrue(countAfterWrite > countBeforeWrite);
