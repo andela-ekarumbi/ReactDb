@@ -15,7 +15,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class DBWriter implements Runnable {
+
     private ScheduledWrite scheduledWrite;
+
+    private String bufferTrackingKey;
 
     /**
      * Creates a new {@code DBWriter}.
@@ -29,7 +32,10 @@ public class DBWriter implements Runnable {
     public DBWriter(Buffer<DbRecord> buffer,
                     MyDbWriter writer,
                     Buffer<String> logBuffer) {
+
         scheduledWrite = new ScheduledWrite(buffer, writer, logBuffer);
+
+        bufferTrackingKey = buffer.registerClientForTracking();
     }
 
     @Override
@@ -49,7 +55,7 @@ public class DBWriter implements Runnable {
 
         private MyDbWriter dbWriter;
 
-        private String bufferTrackingKey;
+        List<DbRecord> latestRecords;
 
         public ScheduledWrite(Buffer<DbRecord> buffer,
                               MyDbWriter writer,
@@ -57,8 +63,6 @@ public class DBWriter implements Runnable {
             this.dbRecordBuffer = buffer;
             this.dbWriter = writer;
             this.logBuffer = logBuffer;
-
-            bufferTrackingKey = dbRecordBuffer.registerClientForTracking();
         }
 
         @Override
@@ -69,6 +73,7 @@ public class DBWriter implements Runnable {
         private void startWritingData() {
             try {
                 getRecordsFromBuffer();
+                writeRecordsToDatabase();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -76,16 +81,16 @@ public class DBWriter implements Runnable {
 
         private void getRecordsFromBuffer() {
             if (dbRecordBuffer.isThereNewData(bufferTrackingKey)) {
-                List<DbRecord> latestRecords
-                        = dbRecordBuffer.getLatestData(bufferTrackingKey);
-                writeRecordsToDatabase(latestRecords);
+                latestRecords= dbRecordBuffer.getLatestData(bufferTrackingKey);
             }
         }
 
-        private void writeRecordsToDatabase(List<DbRecord> latestRecords) {
-            dbWriter.addRecords(latestRecords);
-            for (DbRecord record : latestRecords) {
-                writeLog(record);
+        private void writeRecordsToDatabase() {
+            if (latestRecords != null) {
+                dbWriter.writeRecords(latestRecords);
+                for (DbRecord record : latestRecords) {
+                    writeLog(record);
+                }
             }
         }
 
