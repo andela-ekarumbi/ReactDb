@@ -18,7 +18,8 @@ import java.util.TimerTask;
 public class LogWriter implements Runnable {
 
     private ScheduledLog scheduledLog;
-    private Timer timer;
+
+    private String bufferTrackingKey;
 
     /**
      * Creates a new {@code LogWriter}
@@ -28,11 +29,12 @@ public class LogWriter implements Runnable {
 
     public LogWriter(Buffer<String> logBuffer, String logFilePath) {
         scheduledLog = new ScheduledLog(logBuffer, logFilePath);
+        bufferTrackingKey = logBuffer.registerClientForTracking();
     }
 
     @Override
     public void run() {
-        timer = new Timer();
+        Timer timer = new Timer();
         timer.schedule(scheduledLog, 0, 10);
     }
 
@@ -49,12 +51,9 @@ public class LogWriter implements Runnable {
 
         private String logFilePath;
 
-        private String bufferTrackingKey;
-
         public ScheduledLog(Buffer<String> logBuffer, String logFilePath) {
             this.logBuffer = logBuffer;
             this.logFilePath = logFilePath;
-            bufferTrackingKey = logBuffer.registerClientForTracking();
         }
 
         @Override
