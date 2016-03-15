@@ -30,7 +30,7 @@ public class Utility {
         return threadName
                 + " #"
                 + currentThreadId
-                + " at "
+                + " on "
                 + currentTime
                 + ": Got UNIQUE-ID "
                 + recordUniqueId
