@@ -55,7 +55,7 @@ public class MyDbWriter {
      * @return true for a successful operation, or false otherwise.
      * */
 
-    public boolean addRecords(List<DbRecord> dbRecords) {
+    public boolean writeRecords(List<DbRecord> dbRecords) {
         boolean success = false;
 
         try {
@@ -163,7 +163,7 @@ public class MyDbWriter {
 
                 if (valuesCount > 1) {
                     if (j < valuesCount - 1) {
-                        stringBuilder.append("+del");
+                        stringBuilder.append("&plus;");
                     }
                 }
             }

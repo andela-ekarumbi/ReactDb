@@ -21,7 +21,7 @@ public class LogWriterTest {
         Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
         FileParser fileParser
-                = new FileParser("data/reactions.dat", dbRecordBuffer, logBuffer);
+                = new FileParser("data/react.dat", dbRecordBuffer, logBuffer);
         LogWriter logWriter = new LogWriter(logBuffer, logFileName);
 
         Thread fileParserThread = new Thread(fileParser);

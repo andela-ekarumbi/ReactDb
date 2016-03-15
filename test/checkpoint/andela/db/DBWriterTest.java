@@ -43,10 +43,8 @@ public class DBWriterTest {
 
         int countBeforeWrite = Utility.getDbRecordCount();
 
-        Thread.currentThread().setName("Test thread");
-
-        fileParserThread.run();
-        dbWriterThread.run();
+        fileParserThread.start();
+        dbWriterThread.start();
 
         int countAfterWrite = Utility.getDbRecordCount();
 

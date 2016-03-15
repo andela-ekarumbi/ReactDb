@@ -12,9 +12,9 @@ import java.util.Map;
 
 public class SynchronizedBuffer<T> implements Buffer<T> {
 
-    private List<T> list;
+    private volatile List<T> list;
 
-    private Map<String, Integer> lastAccessedTracker;
+    private volatile Map<String, Integer> lastAccessedTracker;
 
     protected SynchronizedBuffer() {
         list = new ArrayList<>();
