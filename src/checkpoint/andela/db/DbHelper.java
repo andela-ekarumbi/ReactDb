@@ -8,7 +8,7 @@ package checkpoint.andela.db;
 import java.sql.*;
 import java.util.*;
 
-public class MyDbWriter {
+public class DbHelper {
 
     private String dbUrl;
 
@@ -20,12 +20,16 @@ public class MyDbWriter {
 
     private String dbTableName;
 
+    private String dbName;
+
     private Connection connection;
 
     private Statement statement;
 
+    private boolean isDriverRegistered = false;
+
     /**
-     * Creates a new {@code MyDbWriter}.
+     * Creates a new {@code DbHelper}.
      * @param dbDriverName the package name of the database driver to be used.
      * @param dbUrl the url of the database to be accessed.
      * @param dbUsername the username of the database account to be used.
@@ -34,17 +38,19 @@ public class MyDbWriter {
      * going to be written to.
      * */
 
-    public MyDbWriter(String dbDriverName,
-                      String dbUrl,
-                      String dbUsername,
-                      String dbPassword,
-                      String dbTableName) {
+    public DbHelper(String dbDriverName,
+                    String dbUrl,
+                    String dbUsername,
+                    String dbPassword,
+                    String dbName,
+                    String dbTableName) {
 
         this.dbDiverName = dbDriverName;
         this.dbUrl = dbUrl;
         this.dbUsername = dbUsername;
         this.dbPassword = dbPassword;
         this.dbTableName = dbTableName;
+        this.dbName = dbName;
 
         registerDbDriver();
     }
@@ -60,14 +66,13 @@ public class MyDbWriter {
 
         try {
             String sqlString = getInsertStatement(dbRecords);
-            System.out.println(sqlString);
 
             initializeResources();
 
             statement.execute(sqlString);
 
             success = true;
-        } catch (Exception exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
             finalizeResources();
@@ -101,8 +106,11 @@ public class MyDbWriter {
         for (DbRecord record : records) {
             Map<String, List<String>> columns = record.getAllColumns();
             stringBuilder.append("\nINSERT INTO ")
+                    .append("`")
+                    .append(dbName)
+                    .append("`.`")
                     .append(dbTableName)
-                    .append(" (")
+                    .append("` (")
                     .append(getColumnNameString(columns.keySet()))
                     .append(") VALUES (")
                     .append(getColumnValuesString(columns))
@@ -157,7 +165,6 @@ public class MyDbWriter {
             stringBuilder.append("NULL");
         } else {
             stringBuilder.append("'");
-
             for (int j = 0; j < valuesCount; j++) {
                 stringBuilder.append(columnValues.get(j));
 
@@ -167,14 +174,16 @@ public class MyDbWriter {
                     }
                 }
             }
-
             stringBuilder.append("'");
         }
     }
 
     private void registerDbDriver() {
         try {
-            Class.forName(dbDiverName).newInstance();
+            if (!isDriverRegistered) {
+                Class.forName(dbDiverName).newInstance();
+                isDriverRegistered = true;
+            }
         } catch (Exception exception) {
             exception.printStackTrace();
         }

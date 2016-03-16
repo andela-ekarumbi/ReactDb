@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class MyDbWriterTest {
+public class DbHelperTest {
 
     DbRecord dbRecord;
     String testId;
@@ -44,10 +44,11 @@ public class MyDbWriterTest {
 
     @Test
     public void testAddRecords() throws Exception {
-        MyDbWriter writer = new MyDbWriter(Constants.MYSQL_DRIVER_NAME,
+        DbHelper writer = new DbHelper(Constants.MYSQL_DRIVER_NAME,
                 Constants.MYSQL_URL,
                 Constants.MYSQL_USERNAME,
                 Constants.MYSQL_PASSWORD,
+                Constants.DATABASE_NAME,
                 Constants.MYSQL_TABLE_NAME);
 
         int countBeforeWrite = Utility.getDbRecordCount();
