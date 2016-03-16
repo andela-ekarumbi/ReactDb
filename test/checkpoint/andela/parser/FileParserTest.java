@@ -2,7 +2,6 @@ package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferSingletons;
-import checkpoint.andela.db.DbRecord;
 
 import checkpoint.andela.models.Reaction;
 import org.junit.Before;
