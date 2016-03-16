@@ -11,6 +11,10 @@ import checkpoint.andela.utility.Utility;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.*;
 
 public class DBWriterTest {
@@ -41,15 +45,12 @@ public class DBWriterTest {
     @Test
     public void testRun() throws Exception {
         Thread fileParserThread = new Thread(fileParser);
-        Thread dbWriterThread = new Thread(dbWriter);
 
-        int countBeforeWrite = Utility.getDbRecordCount();
+        ScheduledExecutorService scheduler
+                = Executors.newScheduledThreadPool(1);
+        scheduler
+                .scheduleAtFixedRate(dbWriter, 100, 100, TimeUnit.MILLISECONDS);
 
         fileParserThread.start();
-        dbWriterThread.start();
-
-        int countAfterWrite = Utility.getDbRecordCount();
-
-        assertTrue(countAfterWrite > countBeforeWrite);
     }
 }
