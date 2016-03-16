@@ -2,13 +2,15 @@ package checkpoint.andela.log;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferSingletons;
-import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.models.Reaction;
 import checkpoint.andela.parser.FileParser;
 
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LogWriterTest {
 
@@ -26,9 +28,12 @@ public class LogWriterTest {
         LogWriter logWriter = new LogWriter(logBuffer, logFileName);
 
         Thread fileParserThread = new Thread(fileParser);
-        Thread logWriterThread = new Thread(logWriter);
 
         fileParserThread.run();
-        logWriterThread.run();
+
+        ScheduledExecutorService scheduledExecutorService
+                = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService
+                .scheduleAtFixedRate(logWriter, 0, 10, TimeUnit.MILLISECONDS);
     }
 }
