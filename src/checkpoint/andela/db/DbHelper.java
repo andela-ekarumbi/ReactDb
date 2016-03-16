@@ -27,8 +27,6 @@ public class DbHelper {
 
     private Connection connection;
 
-    private Statement statement;
-
     private boolean isDriverRegistered = false;
 
     /**
@@ -68,62 +66,50 @@ public class DbHelper {
         boolean success = false;
 
         try {
-            String sqlString = getInsertStatement(reactions);
-            System.out.println(sqlString);
+            List<String> sqlStatements = getInsertStatements(reactions);
 
-            initializeResources();
+            connection = DriverManager.getConnection(dbUrl,
+                    dbUsername,
+                    dbPassword);
 
-            statement.execute(sqlString);
+            for (String sql : sqlStatements) {
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.execute();
+                statement.close();
+            }
 
             success = true;
         } catch (SQLException exception) {
             exception.printStackTrace();
         } finally {
-            finalizeResources();
+            try {
+                connection.close();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
         }
 
         return success;
     }
 
-    private void initializeResources() {
-        try {
-            connection = DriverManager.getConnection(dbUrl,
-                    dbUsername,
-                    dbPassword);
-            statement = connection.createStatement();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private void finalizeResources() {
-        try {
-            statement.close();
-            connection.close();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private String getInsertStatement(List<Reaction> reactions) {
-        StringBuilder stringBuilder = new StringBuilder();
+    private List<String> getInsertStatements(List<Reaction> reactions) {
+        List<String> statements = new ArrayList<>();
         try {
             for (Reaction reaction : reactions) {
-                stringBuilder.append("\nINSERT INTO ")
-                        .append("`")
-                        .append(dbName)
-                        .append("`.`")
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("INSERT INTO ")
                         .append(dbTableName)
-                        .append("` (")
+                        .append(" (")
                         .append(getColumnNameString(reaction))
                         .append(") VALUES (")
                         .append(getColumnValuesString(reaction))
                         .append(");");
+                statements.add(stringBuilder.toString());
             }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return stringBuilder.toString();
+        return statements;
     }
 
     private String getColumnNameString(Reaction reaction) {
