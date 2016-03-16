@@ -71,18 +71,18 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
     public synchronized List<T> getLatestData(String trackingKey) {
         List<T> latestData = new ArrayList<>();
         if (isKeyRegistered(trackingKey)) {
-            getLatestBatch(trackingKey, latestData);
+            fillLatestData(trackingKey, latestData);
         }
         return latestData;
     }
 
-    private void getLatestBatch(String issuedkey, List<T> latestBatch) {
+    private void fillLatestData(String issuedkey, List<T> latestData) {
         int lastFetchPosition = lastAccessedTracker.get(issuedkey);
         int listSize = list.size();
         for (int i = lastFetchPosition; i < listSize; i++) {
-            latestBatch.add(list.get(i));
+            latestData.add(list.get(i));
         }
-        modifyTracker(issuedkey, listSize);
+        modifyTracker(issuedkey, listSize - 1);
     }
 
 }
