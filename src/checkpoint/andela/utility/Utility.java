@@ -1,11 +1,9 @@
 package checkpoint.andela.utility;
 
 import checkpoint.andela.config.Constants;
-import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.models.Reaction;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Date;
 
 public class Utility {
@@ -37,7 +35,7 @@ public class Utility {
         loadDbDrivers();
 
         loadResources();
-        ResultSet resultSet = null;
+        ResultSet resultSet;
         int count = 0;
         try {
             resultSet = statement.executeQuery(sql);
