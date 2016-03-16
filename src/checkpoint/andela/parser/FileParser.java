@@ -7,7 +7,6 @@
 package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
-import checkpoint.andela.db.DbRecord;
 import checkpoint.andela.models.Reaction;
 import checkpoint.andela.utility.ReactionHelper;
 import checkpoint.andela.utility.Utility;
@@ -28,10 +27,11 @@ public class FileParser implements Runnable {
 
     /**
      * Creates a new {@code FileParser}
-     * @param filePath the path to the data file.
+     *
+     * @param filePath       the path to the data file.
      * @param reactionBuffer the temporary records buffer.
-     * @param logBuffer the temporary log buffer.
-     * */
+     * @param logBuffer      the temporary log buffer.
+     */
 
     public FileParser(String filePath,
                       Buffer<Reaction> reactionBuffer,
@@ -43,7 +43,6 @@ public class FileParser implements Runnable {
 
     @Override
     public void run() {
-        Thread.currentThread().setName("FileParser Thread");
         parseFile();
     }
 
@@ -118,11 +117,9 @@ public class FileParser implements Runnable {
     }
 
     private void extractRecordFromLine(String currentLine, Reaction reaction) {
-        if (currentLine != null && !isDelimiter(currentLine)) {
-            String[] keyValueArray = currentLine.split(" - ");
-            if (keyValueArray.length > 1) {
-                extractKeyAndValue(keyValueArray, reaction);
-            }
+        String[] keyValueArray = currentLine.split(" - ");
+        if (keyValueArray.length > 1) {
+            extractKeyAndValue(keyValueArray, reaction);
         }
     }
 
