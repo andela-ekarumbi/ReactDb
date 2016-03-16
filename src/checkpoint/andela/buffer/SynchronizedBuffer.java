@@ -63,7 +63,8 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
 
     private boolean isNewDataPresent(String issuedKey) {
         return list.size() > 0 &&
-                lastAccessedTracker.get(issuedKey) < lastAccessedTracker.size();
+                lastAccessedTracker.get(issuedKey)
+                        < list.size() - 1;
     }
 
     @Override

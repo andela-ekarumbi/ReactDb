@@ -7,6 +7,7 @@ package checkpoint.andela.db;
 
 
 import checkpoint.andela.buffer.Buffer;
+import checkpoint.andela.models.Reaction;
 import checkpoint.andela.utility.Utility;
 
 import java.util.List;
@@ -22,20 +23,20 @@ public class DBWriter implements Runnable {
 
     /**
      * Creates a new {@code DBWriter}.
-     * @param buffer the buffer containing the records to be written to the
+     * @param reactionBuffer the reactionBuffer containing the records to be written to the
      * database.
      * @param writer the object containing the logic for persisting data to
      * the database.
-     * @param logBuffer the buffer containing log messages.
+     * @param logBuffer the reactionBuffer containing log messages.
      * */
 
-    public DBWriter(Buffer<DbRecord> buffer,
-                    MyDbWriter writer,
+    public DBWriter(Buffer<Reaction> reactionBuffer,
+                    DbHelper writer,
                     Buffer<String> logBuffer) {
 
-        scheduledWrite = new ScheduledWrite(buffer, writer, logBuffer);
+        scheduledWrite = new ScheduledWrite(reactionBuffer, writer, logBuffer);
 
-        bufferTrackingKey = buffer.registerClientForTracking();
+        bufferTrackingKey = reactionBuffer.registerClientForTracking();
     }
 
     @Override
@@ -50,18 +51,18 @@ public class DBWriter implements Runnable {
      * */
 
     private class ScheduledWrite extends TimerTask {
-        private Buffer<DbRecord> dbRecordBuffer;
+        private Buffer<Reaction> reactionBuffer;
         private Buffer<String> logBuffer;
 
-        private MyDbWriter dbWriter;
+        private DbHelper dbHelper;
 
-        List<DbRecord> latestRecords;
+        List<Reaction> latestReactions;
 
-        public ScheduledWrite(Buffer<DbRecord> buffer,
-                              MyDbWriter writer,
+        public ScheduledWrite(Buffer<Reaction> reactionBuffer,
+                              DbHelper dbHelper,
                               Buffer<String> logBuffer) {
-            this.dbRecordBuffer = buffer;
-            this.dbWriter = writer;
+            this.reactionBuffer = reactionBuffer;
+            this.dbHelper = dbHelper;
             this.logBuffer = logBuffer;
         }
 
@@ -72,32 +73,34 @@ public class DBWriter implements Runnable {
 
         private void startWritingData() {
             try {
-                getRecordsFromBuffer();
-                writeRecordsToDatabase();
+                getReactionsFromBuffer();
+                if (latestReactions != null && latestReactions.size() > 0) {
+                    writeReactionsToDatabase();
+                }
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
 
-        private void getRecordsFromBuffer() {
-            if (dbRecordBuffer.isThereNewData(bufferTrackingKey)) {
-                latestRecords= dbRecordBuffer.getLatestData(bufferTrackingKey);
+        private void getReactionsFromBuffer() {
+            if (reactionBuffer.isThereNewData(bufferTrackingKey)) {
+                latestReactions = reactionBuffer.getLatestData(bufferTrackingKey);
             }
         }
 
-        private void writeRecordsToDatabase() {
-            if (latestRecords != null) {
-                dbWriter.writeRecords(latestRecords);
-                for (DbRecord record : latestRecords) {
-                    writeLog(record);
+        private void writeReactionsToDatabase() {
+            if (latestReactions != null) {
+                dbHelper.writeReactions(latestReactions);
+                for (Reaction reaction : latestReactions) {
+                    writeLog(reaction);
                 }
             }
         }
 
-        private void writeLog(DbRecord record) {
+        private void writeLog(Reaction reaction) {
             String messageTermination = " from buffer and wrote to database.";
             String logMessage
-                    = Utility.generateLogMessage(record, messageTermination,
+                    = Utility.generateLogMessage(reaction, messageTermination,
                     "DBWriter Thread");
             logBuffer.addToBuffer(logMessage);
         }

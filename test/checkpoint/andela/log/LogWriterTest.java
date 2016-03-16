@@ -3,6 +3,7 @@ package checkpoint.andela.log;
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.models.Reaction;
 import checkpoint.andela.parser.FileParser;
 
 import org.junit.Test;
@@ -17,11 +18,11 @@ public class LogWriterTest {
                 + (new Date()).toString()
                 + ".txt";
 
-        Buffer<DbRecord> dbRecordBuffer = BufferSingletons.getDbRecordBuffer();
+        Buffer<Reaction> reactionBuffer = BufferSingletons.getReactionBuffer();
         Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
         FileParser fileParser
-                = new FileParser("data/react.dat", dbRecordBuffer, logBuffer);
+                = new FileParser("data/react.dat", reactionBuffer, logBuffer);
         LogWriter logWriter = new LogWriter(logBuffer, logFileName);
 
         Thread fileParserThread = new Thread(fileParser);

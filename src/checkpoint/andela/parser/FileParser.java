@@ -8,6 +8,8 @@ package checkpoint.andela.parser;
 
 import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.models.Reaction;
+import checkpoint.andela.utility.ReactionHelper;
 import checkpoint.andela.utility.Utility;
 
 import java.io.*;
@@ -18,7 +20,7 @@ public class FileParser implements Runnable {
 
     private FileReader fileReader;
 
-    private Buffer<DbRecord> dbRecordBuffer;
+    private Buffer<Reaction> reactionBuffer;
 
     private Buffer<String> logBuffer;
 
@@ -27,15 +29,15 @@ public class FileParser implements Runnable {
     /**
      * Creates a new {@code FileParser}
      * @param filePath the path to the data file.
-     * @param dbRecordBuffer the temporary records buffer.
+     * @param reactionBuffer the temporary records buffer.
      * @param logBuffer the temporary log buffer.
      * */
 
     public FileParser(String filePath,
-                      Buffer<DbRecord> dbRecordBuffer,
+                      Buffer<Reaction> reactionBuffer,
                       Buffer<String> logBuffer) {
         this.dataFile = new File(filePath);
-        this.dbRecordBuffer = dbRecordBuffer;
+        this.reactionBuffer = reactionBuffer;
         this.logBuffer = logBuffer;
     }
 
@@ -81,24 +83,24 @@ public class FileParser implements Runnable {
 
     private void parseRecordStartingFrom(String currentLine) {
         try {
-            DbRecord dbRecord = new DbRecord();
+            Reaction reaction = new Reaction();
             while (!isNull(currentLine) && !isDelimiter(currentLine)) {
                 if (!isComment(currentLine)) {
-                    extractRecordFromLine(currentLine, dbRecord);
+                    extractRecordFromLine(currentLine, reaction);
                 }
                 currentLine = bufferedReader.readLine();
             }
-            dbRecordBuffer.addToBuffer(dbRecord);
-            writeLog(dbRecord);
+            reactionBuffer.addToBuffer(reaction);
+            writeLog(reaction);
         } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
 
-    private void writeLog(DbRecord dbRecord) {
+    private void writeLog(Reaction reaction) {
         String entryTermination = " from file and wrote to buffer.";
         String logEntry
-                = Utility.generateLogMessage(dbRecord, entryTermination,
+                = Utility.generateLogMessage(reaction, entryTermination,
                 "FileParser Thread");
         logBuffer.addToBuffer(logEntry);
     }
@@ -115,20 +117,18 @@ public class FileParser implements Runnable {
         return currentLine == null;
     }
 
-    private void extractRecordFromLine(String currentLine, DbRecord dbRecord) {
+    private void extractRecordFromLine(String currentLine, Reaction reaction) {
         if (currentLine != null && !isDelimiter(currentLine)) {
             String[] keyValueArray = currentLine.split(" - ");
             if (keyValueArray.length > 1) {
-                extractKeyAndValue(keyValueArray, dbRecord);
+                extractKeyAndValue(keyValueArray, reaction);
             }
         }
     }
 
-    private void extractKeyAndValue(String[] keyValueArray, DbRecord dbRecord) {
+    private void extractKeyAndValue(String[] keyValueArray, Reaction reaction) {
         String key = keyValueArray[0].trim();
         String value = keyValueArray[1].trim();
-        if (Utility.isValidColumn(key)) {
-            dbRecord.addColumn(key, value);
-        }
+        ReactionHelper.setReactionProperty(key, value, reaction);
     }
 }

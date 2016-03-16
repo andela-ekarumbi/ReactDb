@@ -5,20 +5,20 @@
 
 package checkpoint.andela.buffer;
 
-import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.models.Reaction;
 
 public class BufferSingletons {
 
-    private static SynchronizedBuffer<String> stringLogBuffer;
+    private static Buffer<String> stringLogBuffer;
 
-    private static SynchronizedBuffer<DbRecord> dbRecordBuffer;
+    private static Buffer<Reaction> reactionBuffer;
 
     /**
      * Returns a Buffer of String objects.
      * @return {@code Buffer<String>}
      * */
 
-    public static SynchronizedBuffer<String> getStringLogBuffer() {
+    public static Buffer<String> getStringLogBuffer() {
         if (stringLogBuffer == null) {
             stringLogBuffer = new SynchronizedBuffer<>();
         }
@@ -30,10 +30,10 @@ public class BufferSingletons {
      * @return {@code Buffer<DbEntry>}
      * */
 
-    public static SynchronizedBuffer<DbRecord> getDbRecordBuffer() {
-        if (dbRecordBuffer == null) {
-            dbRecordBuffer = new SynchronizedBuffer<>();
+    public static Buffer<Reaction> getReactionBuffer() {
+        if (reactionBuffer == null) {
+            reactionBuffer = new SynchronizedBuffer<>();
         }
-        return dbRecordBuffer;
+        return reactionBuffer;
     }
 }

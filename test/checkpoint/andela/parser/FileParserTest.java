@@ -4,6 +4,7 @@ import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.db.DbRecord;
 
+import checkpoint.andela.models.Reaction;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,31 +19,30 @@ public class FileParserTest {
     @Before
     public void beforeTestRun() {
         String filePath = "data/reactions.dat";
-        Buffer<DbRecord> recordBuffer = BufferSingletons.getDbRecordBuffer();
+        Buffer<Reaction> reactionBuffer = BufferSingletons.getReactionBuffer();
         Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
-        fileParser = new FileParser(filePath, recordBuffer, logBuffer);
+        fileParser = new FileParser(filePath, reactionBuffer, logBuffer);
     }
 
     @Test
     public void testRun() throws Exception {
-        Buffer<DbRecord> dbRecordBuffer = BufferSingletons.getDbRecordBuffer();
-        String issuedKey = dbRecordBuffer.registerClientForTracking();
+        Buffer<Reaction> reactionBuffer = BufferSingletons.getReactionBuffer();
+        String issuedKey = reactionBuffer.registerClientForTracking();
 
         Thread fileParserThread = new Thread(fileParser);
         fileParserThread.run();
 
 
-        assertTrue(dbRecordBuffer.isThereNewData(issuedKey));
+        assertTrue(reactionBuffer.isThereNewData(issuedKey));
 
-        List<DbRecord> records = dbRecordBuffer.getLatestData(issuedKey);
-        assertNotNull(records);
-        assertTrue(records.size() > 0);
+        List<Reaction> reactions = reactionBuffer.getLatestData(issuedKey);
+        assertNotNull(reactions);
+        assertTrue(reactions.size() > 0);
 
-        DbRecord dbRecord = records.get(0);
-        assertNotNull(dbRecord);
-        assertTrue(dbRecord.getAllColumns().containsKey("UNIQUE-ID"));
+        Reaction reaction = reactions.get(0);
+        assertNotNull(reaction);
 
-        assertFalse(dbRecordBuffer.isThereNewData(issuedKey));
+        assertFalse(reactionBuffer.isThereNewData(issuedKey));
     }
 }

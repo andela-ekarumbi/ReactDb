@@ -5,6 +5,9 @@
 
 package checkpoint.andela.db;
 
+import checkpoint.andela.models.Reaction;
+
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
@@ -57,15 +60,16 @@ public class DbHelper {
 
     /**
      * Adds a list of records to the database.
-     * @param dbRecords the list of {@code DbRecord} objects to be added.
+     * @param reactions the list of {@code DbRecord} objects to be added.
      * @return true for a successful operation, or false otherwise.
      * */
 
-    public boolean writeRecords(List<DbRecord> dbRecords) {
+    public boolean writeReactions(List<Reaction> reactions) {
         boolean success = false;
 
         try {
-            String sqlString = getInsertStatement(dbRecords);
+            String sqlString = getInsertStatement(reactions);
+            System.out.println(sqlString);
 
             initializeResources();
 
@@ -101,37 +105,40 @@ public class DbHelper {
         }
     }
 
-    private String getInsertStatement(List<DbRecord> records) {
+    private String getInsertStatement(List<Reaction> reactions) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (DbRecord record : records) {
-            Map<String, List<String>> columns = record.getAllColumns();
-            stringBuilder.append("\nINSERT INTO ")
-                    .append("`")
-                    .append(dbName)
-                    .append("`.`")
-                    .append(dbTableName)
-                    .append("` (")
-                    .append(getColumnNameString(columns.keySet()))
-                    .append(") VALUES (")
-                    .append(getColumnValuesString(columns))
-                    .append(");");
+        try {
+            for (Reaction reaction : reactions) {
+                stringBuilder.append("\nINSERT INTO ")
+                        .append("`")
+                        .append(dbName)
+                        .append("`.`")
+                        .append(dbTableName)
+                        .append("` (")
+                        .append(getColumnNameString(reaction))
+                        .append(") VALUES (")
+                        .append(getColumnValuesString(reaction))
+                        .append(");");
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
         return stringBuilder.toString();
     }
 
-    private String getColumnNameString(Set<String> columnNames) {
+    private String getColumnNameString(Reaction reaction) {
         StringBuilder stringBuilder = new StringBuilder();
-        int count = columnNames.size();
+        Field[] fields = getFieldsArray(reaction);
 
-        Object[] columnArray = columnNames.toArray();
+        int fieldLength = fields.length;
 
-        for (int i = 0; i < count; i++) {
-            String columnName = (String) columnArray[i];
+        for (int i = 0; i < fieldLength; i++) {
+            Field field = fields[i];
+            setFieldAccessible(field);
             stringBuilder.append("`")
-                    .append(columnName)
+                    .append(field.getName())
                     .append("`");
-
-            if (i < count - 1) {
+            if (i != fieldLength - 1) {
                 stringBuilder.append(", ");
             }
         }
@@ -139,43 +146,35 @@ public class DbHelper {
         return stringBuilder.toString();
     }
 
-    private String getColumnValuesString(Map<String, List<String>> columns) {
+    private void setFieldAccessible(Field field) {
+        field.setAccessible(true);
+    }
+
+    private Field[] getFieldsArray(Reaction reaction) {
+        Class classObject = reaction.getClass();
+        return classObject.getDeclaredFields();
+    }
+
+    private String getColumnValuesString(Reaction reaction)
+            throws IllegalAccessException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        Object[] columnNameArray = columns.keySet().toArray();
-        int count = columnNameArray.length;
+        Field[] fields = getFieldsArray(reaction);
+        int fieldLength = fields.length;
 
-        for (int i = 0; i < count; i++) {
-            List<String> columnValues = columns.get(columnNameArray[i]);
-            appendColumnValues(stringBuilder, columnValues);
-
-            if (i < count - 1) {
+        for (int i = 0; i < fieldLength; i++) {
+            Field field = fields[i];
+            setFieldAccessible(field);
+            String columnValue = (String)field.get(reaction);
+            stringBuilder.append("'")
+                    .append(columnValue)
+                    .append("'");
+            if (i != fieldLength - 1) {
                 stringBuilder.append(", ");
             }
         }
 
         return stringBuilder.toString();
-    }
-
-    private void appendColumnValues(StringBuilder stringBuilder,
-                                    List<String> columnValues) {
-        int valuesCount = columnValues.size();
-
-        if (valuesCount == 0) {
-            stringBuilder.append("NULL");
-        } else {
-            stringBuilder.append("'");
-            for (int j = 0; j < valuesCount; j++) {
-                stringBuilder.append(columnValues.get(j));
-
-                if (valuesCount > 1) {
-                    if (j < valuesCount - 1) {
-                        stringBuilder.append("&plus;");
-                    }
-                }
-            }
-            stringBuilder.append("'");
-        }
     }
 
     private void registerDbDriver() {

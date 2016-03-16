@@ -2,6 +2,7 @@ package checkpoint.andela.utility;
 
 import checkpoint.andela.config.Constants;
 import checkpoint.andela.db.DbRecord;
+import checkpoint.andela.models.Reaction;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -13,19 +14,12 @@ public class Utility {
 
     private static Statement statement;
 
-    public static boolean isValidColumn(String columnName) {
-        Arrays.sort(Constants.ALLOWED_ATTRIBUTES);
-        int foundPosition
-                = Arrays.binarySearch(Constants.ALLOWED_ATTRIBUTES, columnName);
-        return foundPosition >= 0;
-    }
-
-    public static String generateLogMessage(DbRecord record,
+    public static String generateLogMessage(Reaction reaction,
                                             String termination,
                                             String threadName) {
         String currentTime = (new Date()).toString();
         String recordUniqueId
-                = record.getAllColumns().get("UNIQUE-ID").get(0);
+                = reaction.getUniqueId();
         String currentThreadId = Long.toString(Thread.currentThread().getId());
         return threadName
                 + " #"
