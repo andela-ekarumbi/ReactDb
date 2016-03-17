@@ -28,10 +28,10 @@ public class DBWriter implements Runnable {
      * Creates a new {@code DBWriter}.
      *
      * @param reactionBuffer the reactionBuffer containing the records to be written to the
-     * database.
-     * @param dbHelper the object containing the logic for persisting data to
-     * the database.
-     * @param logBuffer the reactionBuffer containing log messages.
+     *                       database.
+     * @param dbHelper       the object containing the logic for persisting data to
+     *                       the database.
+     * @param logBuffer      the reactionBuffer containing log messages.
      */
 
     public DBWriter(Buffer<Reaction> reactionBuffer,
@@ -69,10 +69,11 @@ public class DBWriter implements Runnable {
 
     private void writeReactionsToDatabase() {
         if (latestReactions != null) {
-            for (Reaction reaction : latestReactions) {
-                writeLog(reaction);
+            if (dbHelper.writeReactions(latestReactions)) {
+                for (Reaction reaction : latestReactions) {
+                    writeLog(reaction);
+                }
             }
-            dbHelper.writeReactions(latestReactions);
         }
     }
 
