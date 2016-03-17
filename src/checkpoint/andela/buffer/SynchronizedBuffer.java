@@ -22,21 +22,24 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
     }
 
     @Override
-    public synchronized void addToBuffer(T item) {
-        addToList(item);
+    public synchronized boolean addToBuffer(T item) {
+        return addToList(item);
     }
 
-    private void addToList(T item) {
+    private boolean addToList(T item) {
         list.add(item);
+        return true;
     }
 
     @Override
-    public synchronized void addListToBuffer(List<T> itemsList) {
+    public synchronized boolean addListToBuffer(List<T> itemsList) {
         if (itemsList.size() > 0) {
             for (T item : itemsList) {
                 addToList(item);
             }
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -63,25 +66,26 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
 
     private boolean isNewDataPresent(String issuedKey) {
         return list.size() > 0 &&
-                lastAccessedTracker.get(issuedKey) < lastAccessedTracker.size();
+                lastAccessedTracker.get(issuedKey)
+                        < list.size() - 1;
     }
 
     @Override
     public synchronized List<T> getLatestData(String trackingKey) {
         List<T> latestData = new ArrayList<>();
         if (isKeyRegistered(trackingKey)) {
-            getLatestBatch(trackingKey, latestData);
+            fillLatestData(trackingKey, latestData);
         }
         return latestData;
     }
 
-    private void getLatestBatch(String issuedkey, List<T> latestBatch) {
+    private void fillLatestData(String issuedkey, List<T> latestData) {
         int lastFetchPosition = lastAccessedTracker.get(issuedkey);
         int listSize = list.size();
         for (int i = lastFetchPosition; i < listSize; i++) {
-            latestBatch.add(list.get(i));
+            latestData.add(list.get(i));
         }
-        modifyTracker(issuedkey, listSize);
+        modifyTracker(issuedkey, listSize - 1);
     }
 
 }

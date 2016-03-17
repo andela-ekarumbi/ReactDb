@@ -17,7 +17,7 @@ public class SynchronizedBufferTest {
         testRunnable = new Runnable() {
             @Override
             public void run() {
-                SynchronizedBuffer<String> stringBuffer
+                Buffer<String> stringBuffer
                         = BufferSingletons.getStringLogBuffer();
 
                 List<String> testList = new ArrayList<>();
