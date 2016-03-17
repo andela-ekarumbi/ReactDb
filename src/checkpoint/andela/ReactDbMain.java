@@ -5,8 +5,10 @@ import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.config.Constants;
 import checkpoint.andela.db.DBWriter;
 import checkpoint.andela.db.DbHelper;
+import checkpoint.andela.log.LogHelper;
 import checkpoint.andela.log.LogWriter;
 import checkpoint.andela.models.Reaction;
+import checkpoint.andela.parser.FileParseHelper;
 import checkpoint.andela.parser.FileParser;
 
 import java.util.Date;
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ReactDbMain {
 
-    public static void main(String[] args) {
+    public void main() {
         String logFileName = "logs/logFile "
                 + (new Date()).toString()
                 + ".txt";
@@ -25,20 +27,21 @@ public class ReactDbMain {
         Buffer<String> logBuffer = BufferSingletons.getStringLogBuffer();
 
 
-        FileParser fileParser = new FileParser("data/reactions.dat",
+        FileParseHelper fileParseHelper = new FileParseHelper("data/reactions.dat",
                 reactionBuffer,
                 logBuffer);
+        FileParser fileParser = new FileParser(fileParseHelper);
 
         DbHelper dbHelper = new DbHelper(Constants.MYSQL_DRIVER_NAME,
                 Constants.MYSQL_URL,
                 Constants.MYSQL_USERNAME,
                 Constants.MYSQL_PASSWORD,
-                Constants.DATABASE_NAME,
                 Constants.MYSQL_TABLE_NAME);
 
         DBWriter dbWriter = new DBWriter(reactionBuffer, dbHelper, logBuffer);
 
-        LogWriter logWriter = new LogWriter(logBuffer, logFileName);
+        LogHelper logHelper = new LogHelper(logBuffer, logFileName);
+        LogWriter logWriter = new LogWriter(logHelper);
 
         Thread fileParserThread = new Thread(fileParser);
 
