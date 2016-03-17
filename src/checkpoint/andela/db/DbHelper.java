@@ -23,8 +23,6 @@ public class DbHelper {
 
     private String dbTableName;
 
-    private String dbName;
-
     private Connection connection;
 
     private boolean isDriverRegistered = false;
@@ -43,7 +41,6 @@ public class DbHelper {
                     String dbUrl,
                     String dbUsername,
                     String dbPassword,
-                    String dbName,
                     String dbTableName) {
 
         this.dbDiverName = dbDriverName;
@@ -51,7 +48,6 @@ public class DbHelper {
         this.dbUsername = dbUsername;
         this.dbPassword = dbPassword;
         this.dbTableName = dbTableName;
-        this.dbName = dbName;
 
         registerDbDriver();
     }
@@ -100,9 +96,9 @@ public class DbHelper {
                 stringBuilder.append("INSERT INTO ")
                         .append(dbTableName)
                         .append(" (")
-                        .append(getColumnNameString(reaction))
+                        .append(getColumnString(reaction, true))
                         .append(") VALUES (")
-                        .append(getColumnValuesString(reaction))
+                        .append(getColumnString(reaction, false))
                         .append(");");
                 statements.add(stringBuilder.toString());
             }
@@ -110,26 +106,6 @@ public class DbHelper {
             exception.printStackTrace();
         }
         return statements;
-    }
-
-    private String getColumnNameString(Reaction reaction) {
-        StringBuilder stringBuilder = new StringBuilder();
-        Field[] fields = getFieldsArray(reaction);
-
-        int fieldLength = fields.length;
-
-        for (int i = 0; i < fieldLength; i++) {
-            Field field = fields[i];
-            setFieldAccessible(field);
-            stringBuilder.append("`")
-                    .append(field.getName())
-                    .append("`");
-            if (i != fieldLength - 1) {
-                stringBuilder.append(", ");
-            }
-        }
-
-        return stringBuilder.toString();
     }
 
     private void setFieldAccessible(Field field) {
@@ -141,7 +117,8 @@ public class DbHelper {
         return classObject.getDeclaredFields();
     }
 
-    private String getColumnValuesString(Reaction reaction)
+    private String getColumnString(Reaction reaction,
+                                   boolean expectsColumnNames)
             throws IllegalAccessException {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -151,16 +128,27 @@ public class DbHelper {
         for (int i = 0; i < fieldLength; i++) {
             Field field = fields[i];
             setFieldAccessible(field);
-            String columnValue = (String)field.get(reaction);
-            stringBuilder.append("'")
-                    .append(columnValue)
-                    .append("'");
+            if (expectsColumnNames) {
+                String fieldName = field.getName();
+                stringBuilder.append(generateColumnNameString(fieldName));
+            } else {
+                String fieldValue = (String)field.get(reaction);
+                stringBuilder.append(generateColumnValueString(fieldValue));
+            }
             if (i != fieldLength - 1) {
                 stringBuilder.append(", ");
             }
         }
 
         return stringBuilder.toString();
+    }
+
+    private String generateColumnNameString(String fieldName) {
+        return "`" + fieldName + "`";
+    }
+
+    private String generateColumnValueString(String fieldValue) {
+        return "'" + fieldValue + "'";
     }
 
     private void registerDbDriver() {
