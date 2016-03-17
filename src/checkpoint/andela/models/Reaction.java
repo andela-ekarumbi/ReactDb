@@ -1,7 +1,5 @@
 package checkpoint.andela.models;
 
-import java.util.List;
-
 public class Reaction {
 
     private String uniqueId = "";
