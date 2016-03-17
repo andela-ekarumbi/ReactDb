@@ -22,21 +22,24 @@ public class SynchronizedBuffer<T> implements Buffer<T> {
     }
 
     @Override
-    public synchronized void addToBuffer(T item) {
-        addToList(item);
+    public synchronized boolean addToBuffer(T item) {
+        return addToList(item);
     }
 
-    private void addToList(T item) {
+    private boolean addToList(T item) {
         list.add(item);
+        return true;
     }
 
     @Override
-    public synchronized void addListToBuffer(List<T> itemsList) {
+    public synchronized boolean addListToBuffer(List<T> itemsList) {
         if (itemsList.size() > 0) {
             for (T item : itemsList) {
                 addToList(item);
             }
+            return true;
         }
+        return false;
     }
 
     @Override
