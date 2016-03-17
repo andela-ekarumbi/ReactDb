@@ -4,6 +4,7 @@ import checkpoint.andela.buffer.Buffer;
 import checkpoint.andela.buffer.BufferSingletons;
 import checkpoint.andela.config.Constants;
 import checkpoint.andela.models.Reaction;
+import checkpoint.andela.parser.FileParseHelper;
 import checkpoint.andela.parser.FileParser;
 
 import checkpoint.andela.utility.Utility;
@@ -34,12 +35,14 @@ public class DBWriterTest {
                 Constants.MYSQL_URL,
                 Constants.MYSQL_USERNAME,
                 Constants.MYSQL_PASSWORD,
-                Constants.DATABASE_NAME,
                 Constants.MYSQL_TABLE_NAME);
 
         dbWriter = new DBWriter(reactionBuffer, dbHelper, logBuffer);
 
-        fileParser = new FileParser(filePath, reactionBuffer, logBuffer);
+        FileParseHelper fileParseHelper
+                = new FileParseHelper(filePath, reactionBuffer, logBuffer);
+
+        fileParser = new FileParser(fileParseHelper);
     }
 
     @Test
