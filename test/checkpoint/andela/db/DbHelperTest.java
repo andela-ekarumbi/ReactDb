@@ -49,7 +49,6 @@ public class DbHelperTest {
                 Constants.MYSQL_URL,
                 Constants.MYSQL_USERNAME,
                 Constants.MYSQL_PASSWORD,
-                Constants.DATABASE_NAME,
                 Constants.MYSQL_TABLE_NAME);
 
         int countBeforeWrite = Utility.getDbRecordCount();
